@@ -1,0 +1,119 @@
+local modemSide = arg[1]
+local mode = arg[2]
+local name = arg[3]
+local password = arg[4]
+
+if not modemSide or not mode or not name or not password then
+    print("Usage:")
+    print("Host:    remotectrl <side> host <name> <password>")
+    print("Connect: remotectrl <side> connect <name> <password> <command>")
+    return
+end
+
+rednet.open(modemSide)
+
+--------------------------------------------------
+-- HOST MODE
+--------------------------------------------------
+
+if mode == "host" then
+
+    rednet.host("remotectrl", name)
+
+    print("Hosting as '" .. name .. "'")
+
+    while true do
+        local sender, msg = rednet.receive("remotectrl")
+
+        if type(msg) ~= "table" then
+            goto continue
+        end
+
+        if msg.password ~= password then
+            rednet.send(sender, {
+                success = false,
+                output = "Invalid password"
+            }, "remotectrl")
+            goto continue
+        end
+
+        local buffer = {}
+
+        local fakeTerm = {}
+
+        function fakeTerm.write(text)
+            table.insert(buffer, tostring(text))
+        end
+
+        function fakeTerm.blit(text)
+            table.insert(buffer, tostring(text))
+        end
+
+        function fakeTerm.clear() end
+        function fakeTerm.clearLine() end
+        function fakeTerm.setCursorPos() end
+        function fakeTerm.getCursorPos() return 1,1 end
+        function fakeTerm.getSize() return term.getSize() end
+        function fakeTerm.setTextColor() end
+        function fakeTerm.setBackgroundColor() end
+        function fakeTerm.isColor() return term.isColor() end
+        function fakeTerm.scroll() end
+
+        local oldTerm = term.current()
+        term.redirect(fakeTerm)
+
+        local ok, err = pcall(function()
+            shell.run(msg.command)
+        end)
+
+        term.redirect(oldTerm)
+
+        rednet.send(sender, {
+            success = ok,
+            output = ok and table.concat(buffer, "") or tostring(err)
+        }, "remotectrl")
+
+        ::continue::
+    end
+
+--------------------------------------------------
+-- CONNECT MODE
+--------------------------------------------------
+
+elseif mode == "connect" then
+
+    local command = table.concat(arg, " ", 5)
+
+    if command == "" then
+        print("Missing command")
+        return
+    end
+
+    local id = rednet.lookup("remotectrl", name)
+
+    if not id then
+        print("Host not found")
+        return
+    end
+
+    rednet.send(id, {
+        password = password,
+        command = command
+    }, "remotectrl")
+
+    local sender, response = rednet.receive("remotectrl", 10)
+
+    if not response then
+        print("Timed out")
+        return
+    end
+
+    if response.success then
+        print(response.output)
+    else
+        print("ERROR: " .. response.output)
+    end
+
+else
+    print("Mode must be 'host' or 'connect'")
+end
