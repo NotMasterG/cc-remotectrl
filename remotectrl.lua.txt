@@ -78,14 +78,7 @@ elseif mode == "connect" then
         return
     end
 
-    local id = rednet.lookup(PROTOCOL, name)
-
-    if not id then
-        print("Host not found")
-        return
-    end
-
-    rednet.send(id, {
+    rednet.broadcast({
         password = password,
         command = command
     }, PROTOCOL)
