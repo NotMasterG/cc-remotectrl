@@ -1,14 +1,14 @@
 local args = {...}
 
-local modemSide = args[1]
-local mode = args[2]
+local mode = args[1]
+local modemSide = args[2]
 local name = args[3]
 local password = args[4]
 
 if not modemSide or not mode or not name or not password then
     print("Usage:")
-    print("  Host:    remotectrl <modem> host <name> <pass>")
-    print("  Connect: remotectrl <modem> connect <name> <pass> <cmd>")
+    print("Host:    remotectrl host <modem> <name> <pass>")
+    print("Execute: remotectrl exe <modem> <name> <pass> <cmd>")
     return
 end
 
@@ -28,11 +28,12 @@ if mode == "host" then
         local sender, msg = rednet.receive(PROTOCOL)
 
         if type(msg) ~= "table" then goto continue end
+        if msg.name ~= name then goto continue end
 
-        if msg.password ~= password then
+        if msg.pass ~= password then
             rednet.send(sender, {
                 ok = false,
-                output = "bad password"
+                output = "Wrong password"
             }, PROTOCOL)
             goto continue
         end
@@ -43,7 +44,7 @@ if mode == "host" then
         local old = term.redirect(win)
 
         local ok, err = pcall(function()
-            shell.run(msg.command)
+            shell.run(msg.cmd)
         end)
 
         term.redirect(old)
@@ -69,7 +70,7 @@ if mode == "host" then
 -------------------------------------------------------
 -- CONNECT MODE
 -------------------------------------------------------
-elseif mode == "connect" then
+elseif mode == "exe" then
 
     local command = table.concat(args, " ", 5)
 
@@ -79,8 +80,9 @@ elseif mode == "connect" then
     end
 
     rednet.broadcast({
-        password = password,
-        command = command
+        name = name,
+        pass = password,
+        cmd = command
     }, PROTOCOL)
 
     local sender, resp = rednet.receive(PROTOCOL, 10)
