@@ -167,7 +167,7 @@ elseif mode == "exe" then
         rednet.broadcast({
             t = 0,
             n = name
-        })
+        }, PROTOCOL)
         sender, resp = rednet.receive(PROTOCOL, 5)
         if not resp then
             print("Host not found")
