@@ -16,7 +16,8 @@ o=term.redirect(W)local
 k,e=pcall(function()shell.run(m.c)end)term.redirect(o)local
 B={}for
 y=1,h do
-W.setCursorPos(1,y)B[#B+1]=W.getLine(y)rednet.send(s,{k=k,o=table.concat(B,"\n"),e=e},L)::C::end
+W.setCursorPos(1,y)B[#B+1]=W.getLine(y)end
+rednet.send(s,{k=k,o=table.concat(B,"\n"),e=e},L)::C::end
 elseif G[1]=="exe"then
 c=table.concat(G," ",5)if c==""then
 print("No command provided");return end
