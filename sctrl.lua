@@ -17,13 +17,14 @@ rednet.send(s,{t=1,g=n},L)elseif m.t==2 then
 local n=E[s]E[s]=nil if not n then
 rednet.send(s,{k=false,o="Handshake failure"},L)goto C end
 local x=H(P..n)if m.a~=x then
-rednet.send(s,{k=false,o="Auth failed"},L)goto C end 
+rednet.send(s,{k=false,o="Auth failed"},L)goto C end
 local d=term.redirect(W)local
 k,e=pcall(function()shell.run(m.c)end)term.redirect(d)local
 B={}for y=1,select(2,W.getSize())do
 B[#B+1]=W.getLine(y)end
 rednet.send(s,{k=k,o=table.concat(B,"\n"),e=e},L)elseif
-m.p and m.c and G[4]=="t"then if m.n~=N then goto C end    
+m.p and m.c and G[4]=="t"then if m.n~=N then goto C end
+if m.p~=P then rednet.send(s,{k=false,o="Wrong password"},L)goto C end
 local d=term.redirect(W)local
 k,e=pcall(function()shell.run(m.c)end)term.redirect(d)local
 B={}for y=1,select(2,W.getSize())do B[#B+1]=W.getLine(y)end
