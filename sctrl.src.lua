@@ -182,7 +182,7 @@ elseif mode == "exe" then
 
     local auth = hash(password .. resp.g)
 
-    rednet.send(id, {
+    rednet.send(sender, {
         t = 2,
         a = auth,
         c = command
