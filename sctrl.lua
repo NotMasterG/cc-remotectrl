@@ -1,19 +1,18 @@
-local G,L,S,N={...},"sctrl",G[2],G[3]if not N then
+local G,L={...},"sctrl"local
+S,N=G[2],G[3]if not N then
 print("Usage:\nsctrl host <modem> <name> <rctrl?:-/t>\nsctrl exe <modem> <name> <cmd>")return end
 if G[4]=="t"then L="rctrl"end
 write("Password: ")local
 P=read("*")rednet.open(S)local
 function H(s)local h=0 for i=1,#s do
 h=(h*31+string.byte(s,i))%2^32
-end return tostring(h)end local function N()return
-tostring(math.random(10^6,10^7-1))..tostring(os.epoch("utc"))end
-if G[1]=="host"then
+end return tostring(h)end if G[1]=="host"then
 rednet.host(L,N)print("Hosting as "..N.."\nProtocol: "..L)local
 E={}while 1 do local s,m=rednet.receive(L)local
 W=window.create(term.current(),1,1,term.getSize())if
 type(m)~="table"then goto C end
-if m.t==0 then if m.n~=N then goto C
-end local n=N()E[s]=n
+if m.t==0 then if m.n~=N then goto C end
+local n=tostring(math.random(10^6,10^7-1))..tostring(os.epoch("utc"))E[s]=n
 rednet.send(s,{t=1,g=n},L)elseif m.t==2 then
 local n=E[s]E[s]=nil if not n then
 rednet.send(s,{k=false,o="Handshake failure"},L)goto C end
