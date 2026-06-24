@@ -164,18 +164,17 @@ elseif mode == "exe" then
     if not resp then
         print("sctrl failed, searching rctrl")
         PROTOCOL = "rctrl"
+        rednet.broadcast({
+            t = 0,
+            n = name
+        })
+        sender, resp = rednet.receive(PROTOCOL, 5)
+        if not resp then
+            print("Host not found")
+            return
+        end
     end
     
-    rednet.broadcast({
-        t = 0,
-        n = name
-    })
-    local sender, resp = rednet.receive(PROTOCOL, 5)
-    
-    if not resp then
-        print("Host not found")
-        return
-    end
     if resp.t ~= 1 then
         print("Handshake failure")
         return
