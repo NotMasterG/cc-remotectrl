@@ -8,7 +8,7 @@ local cmd = args[4]
 
 if not modemSide or not mode or not name then
     print("Usage:")
-    print(" Host: sctrl host <modem> <name> <useRctrl:t/f>")
+    print("Host: sctrl host <modem> <name> <useRctrl:t/f>")
     print("Exe: sctrl exe <modem> <name> <cmd>")
     return
 end
@@ -155,7 +155,7 @@ elseif mode == "exe" then
 
     -- broadcast init on sctrl then rctrl
     rednet.broadcast({
-        t = 0
+        t = 0,
         n = name
     }, PROTOCOL)
 
@@ -167,7 +167,7 @@ elseif mode == "exe" then
     end
     
     rednet.broadcast({
-        t = 0
+        t = 0,
         n = name
     })
     local sender, resp = rednet.receive(PROTOCOL, 5)
